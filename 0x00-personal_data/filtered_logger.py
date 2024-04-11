@@ -28,6 +28,9 @@ def filter_datum(fields: List[str], redaction: str, message: str,
                          f"{field}={redaction}", message)
     return message
 
+# Define PII fields that you intend to obfuscate
+PII_FIELDS = ('name', 'email', 'phone', 'password', 'ssn')
+
 
 class RedactingFormatter(logging.Formatter):
     """ Redacting Formatter class """
@@ -36,17 +39,22 @@ class RedactingFormatter(logging.Formatter):
     FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
     SEPARATOR = ";"
 
-    def __init__(self, fields):
+    def __init__(self, fields: List[str] = None):
         super(RedactingFormatter, self).__init__(self.FORMAT)
-        self.fields = fields
+        self.fields = fields if fields else []
 
     def format(self, record: logging.LogRecord) -> str:
-        return filter_datum(self.fields, self.REDACTION,
-                            super().format(record), self.SEPARATOR)
+            """
+            Formats the log record and applies data filtering.
 
+            Args:
+                record (logging.LogRecord): The log record to be formatted.
 
-# Define PII fields that you intend to obfuscate
-PII_FIELDS = ["username", "password", "email"]
+            Returns:
+                str: The formatted log record with filtered data.
+            """
+            return filter_datum(self.fields, self.REDACTION,
+                                super().format(record), self.SEPARATOR)
 
 
 def get_logger() -> logging.Logger:
@@ -54,12 +62,17 @@ def get_logger() -> logging.Logger:
     Setups and returns a logger with a redacting formatter
     that obfuscates PII fields.
     """
-    logger = logging.getLogger("PII_logger")
+    logger = logging.getLogger("user_data")
     logger.setLevel(logging.INFO)
-    stream_handler = logging.StreamHandler()
+    
     formatter = RedactingFormatter(fields=PII_FIELDS)
+    
+    stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(formatter)
+
     logger.addHandler(stream_handler)
+    logger.propagete = False
+
     return logger
 
 
