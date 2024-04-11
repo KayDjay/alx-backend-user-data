@@ -1,5 +1,5 @@
-import bcrypt
-
+#!/usr/bin/env python3
+""" This is an encrypt module"""
 import bcrypt
 
 
@@ -37,4 +37,4 @@ def is_valid(hashed_password: bytes, password: str) -> bool:
     return bcrypt.checkpw(
         password.encode('utf-8'),
         hashed_password_str.encode('utf-8')
-)
+    )
