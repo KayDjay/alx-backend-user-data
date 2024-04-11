@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" This is Regex-ing module """
+""" This module helps user logging and filtering data """
 
 import re
 import logging
@@ -9,7 +9,8 @@ import mysql.connector
 from mysql.connector.connection import MySQLConnection
 
 
-def filter_datum(fields, redaction, message, separator):
+def filter_datum(fields: List[str], redaction: str, message: str,
+                 separator: str) -> str:
     """
     Replace sensitive information in a message with a redacted value.
 
@@ -22,8 +23,10 @@ def filter_datum(fields, redaction, message, separator):
     Returns:
         str: The message with the sensitive information redacted.
     """
-    regex = re.compile(f"({'|'.join(fields)})=(.*?){separator}")
-    return regex.sub(f"\\1={redaction}{separator}", message)
+    for field in fields:
+        message = re.sub(f"{field}=[^{separator}]*",
+                         f"{field}={redaction}", message)
+    return message
 
 
 class RedactingFormatter(logging.Formatter):
