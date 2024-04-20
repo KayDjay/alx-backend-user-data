@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Basic Auth Module.
+class to manage the API authentication.
 """
 
 

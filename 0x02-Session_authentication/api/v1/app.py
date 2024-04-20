@@ -21,12 +21,26 @@ if os.environ.get('AUTH_TYPE') == 'auth':
 elif os.environ.get('AUTH_TYPE') == 'basic_auth':
     from api.v1.auth.basic_auth import BasicAuth
     auth = BasicAuth()
+elif os.environ.get('AUTH_TYPE') == 'session_auth':
+    from api.v1.auth.session_auth import SessionAuth
+    auth = SessionAuth()
+elif os.environ.get('AUTH_TYPE') == 'session_exp_auth':
+    from api.v1.auth.session_exp_auth import SessionExpAuth
+    auth = SessionExpAuth()
 
 
 @app.before_request
 def handle_before_request():
     """
-    This function secure access to routes that required for user authentication
+    Handles the before request logic for authentication.
+
+    This function checks if authentication is required for
+    the current request path. If authentication is required,
+    it checks if the request has a valid authorization header.
+    If the authorization header is missing or invalid, it
+    aborts the request with a 401 status code. If the current
+    user is not authenticated, it aborts the request with a
+    403 status code.
     """
     if auth is None:
         return
@@ -36,14 +50,21 @@ def handle_before_request():
         [
             '/api/v1/status/',
             '/api/v1/unauthorized/',
-            '/api/v1/forbidden/'
+            '/api/v1/forbidden/',
+            '/api/v1/auth_session/login/'
         ]
     ):
         return
 
+    if auth.authorization_header(request) is None and \
+            auth.session_cookie(request) is None:
+        abort(401)
+
     if auth.current_user(request) is None:
         abort(403)
-    self.current_user = auth.current_user(request)
+
+
+    request.current_user = auth.current_user(request)
 
 
 @app.errorhandler(404)
@@ -55,14 +76,14 @@ def not_found(error) -> str:
 
 @app.errorhandler(401)
 def not_found(error) -> str:
-    """ Function to check for authorized handler
+    """ unauthorized handler
     """
     return jsonify({"error": "Unauthorized"}), 401
 
 
 @app.errorhandler(403)
 def not_found(error) -> str:
-    """ Forbidden handler function
+    """ Forbidden handler
     """
     return jsonify({"error": "Forbidden"}), 403
 
