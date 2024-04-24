@@ -1,19 +1,12 @@
-#!/usr/bin/env python3
-""" Main 0
+#!/usr/bin/python3
+""" Check response
 """
-import base64
-from api.v1.auth.basic_auth import BasicAuth
-from models.user import User
+import requests
 
-""" Create a user test """
-user_email = "bob@hbtn.io"
-user_clear_pwd = "H0lbertonSchool98!"
-
-user = User()
-user.email = user_email
-user.password = user_clear_pwd
-print("New user: {}".format(user.id))
-user.save()
-
-basic_clear = "{}:{}".format(user_email, user_clear_pwd)
-print("Basic Base64: {}".format(base64.b64encode(basic_clear.encode('utf-8')).decode("utf-8")))
+if __name__ == "__main__":
+    r = requests.get('http://0.0.0.0:3456/api/v1/users/me', cookies={'_my_session_id': "fake session ID"})
+    if r.status_code != 403:
+        print("Wrong status code: {}".format(r.status_code))
+        exit(1)
+    print("OK", end="")
+    
