@@ -8,11 +8,12 @@ from user import User
 from uuid import uuid4
 from typing import Union
 
+
 def _generate_uuid() -> str:
-        """
-        Generates a string representation of a new UUID.
-        """
-        return str(uuid4())
+    """
+    Generates a string representation of a new UUID.
+    """
+    return str(uuid4())
 
 
 def _hash_password(password: str) -> bytes:
