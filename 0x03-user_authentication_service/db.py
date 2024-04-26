@@ -64,4 +64,3 @@ class DB:
             else:
                 raise ValueError(f"Invalid attribute: {attr}")
         self._session.commit()
-
