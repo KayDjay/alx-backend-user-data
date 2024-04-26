@@ -51,11 +51,12 @@ class Auth:
         Returns:
           None
         """
+
         if self._db._session.query(User).filter_by(email=email).first():
-            raise ValueError(f"User '{email}' already exists")
+            raise ValueError(f"User {email} already exists")
 
         return self._db.add_user(email, _hash_password(password))
-
+ 
     def valid_login(self, email: str, password: str) -> bool:
         """
         Validates a user's login credentials.
