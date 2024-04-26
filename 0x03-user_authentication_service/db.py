@@ -50,7 +50,6 @@ class DB:
             raise NoResultFound
         except InvalidRequestError:
             raise InvalidRequestError("Invalid query arguments")
-        return user
 
     def update_user(self, user_id: int, **kwargs) -> None:
         """Update a user's attributes
@@ -65,4 +64,4 @@ class DB:
             else:
                 raise ValueError(f"Invalid attribute: {attr}")
         self._session.commit()
-        return None
+
