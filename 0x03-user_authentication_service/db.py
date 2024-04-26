@@ -18,7 +18,7 @@ class DB:
     def __init__(self) -> None:
         """Initialize a new DB instance
         """
-        self._engine = create_engine("sqlite:///a.db", echo=True)
+        self._engine = create_engine("sqlite:///a.db", echo=False)
         Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
         self.__session = None
@@ -50,6 +50,7 @@ class DB:
             raise NoResultFound
         except InvalidRequestError:
             raise InvalidRequestError("Invalid query arguments")
+        return user
 
     def update_user(self, user_id: int, **kwargs) -> None:
         """Update a user's attributes
@@ -64,3 +65,4 @@ class DB:
             else:
                 raise ValueError(f"Invalid attribute: {attr}")
         self._session.commit()
+        return None
