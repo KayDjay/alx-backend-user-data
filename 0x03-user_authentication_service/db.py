@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound, InvalidRequestError
 from user import Base, User
 
 
@@ -44,12 +44,23 @@ class DB:
         """Find a user in the database based on input arguments
         """
         try:
-            # Query the database with the provided keyword arguments
             user = self._session.query(User).filter_by(**kwargs).first()
             if user is None:
-                # If no user found, raise NoResultFound
                 raise NoResultFound
             return user
         except InvalidRequestError:
-            # If an invalid query is made, raise InvalidRequestError
             raise InvalidRequestError("Invalid query arguments")
+
+    def update_user(self, user_id: int, **kwargs) -> None:
+        """Update a user's attributes
+        """
+        try:
+            user = self.find_user_by(id=user_id)
+        except NoResultFound:
+            raise NoResultFound(f"No user found with id: {user_id}")
+        for attr, value in kwargs.items():
+            if hasattr(User, attr):
+                setattr(user, attr, value)
+            else:
+                raise ValueError(f"Invalid attribute: {attr}")
+        self._session.commit()
